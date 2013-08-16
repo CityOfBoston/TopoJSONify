@@ -6,6 +6,8 @@ var child = require("child_process");
 var port = process.env.PORT || 3000;
 var app = express();
 app.use(express.bodyParser());
+app.set('json spaces',0);
+app.use(express.compress());
 app.use(express.methodOverride());
 app.listen(port);
 
