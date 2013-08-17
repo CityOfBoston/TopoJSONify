@@ -17,11 +17,14 @@ app.get('/', function(req, res){
 
 var topo_out = function( req, res, topology ){
   if(req.query && (req.query.doubledouble == "true" || req.query.doubleDouble == "true" || req.query.DoubleDouble == "true")){
-    var start = topology.objects.collection.geometries.length;
-    for(var i=0;i<start;i++){
-      var newobj = [ topology.objects.collection.geometries[i] ].concat();
-      newobj[0].id = start + i + 1;
-      topology.objects.collection.geometries.push( newobj[0] );
+    var endpt = topology.objects.collection.geometries.length;
+    for(var i=0;i<endpt;i++){
+      var newobj = {
+        id: start + i + 1,
+        type: topology.objects.collection.geometries[i].type + "",
+        arcs: topology.objects.collection.geometries[i].arcs.concat( )
+      };
+      topology.objects.collection.geometries.push( newobj );
     }
   }
   if(req.query && (req.query.animalstyle == "true" || req.query.animalStyle == "true" || req.query.AnimalStyle == "true")){
