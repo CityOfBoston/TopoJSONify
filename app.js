@@ -15,6 +15,23 @@ app.get('/', function(req, res){
   res.sendfile(__dirname + '/index.html');
 });
 
+var topo_out = function( req, res, topology ){
+  if(req.query && req.query.doubledouble == "true"){
+    var start = topology.objects.collection.geometries.length;
+    topology.objects.collection.geometries = topology.objects.collection.geometries.concat( topology.objects.collection.geometries );
+    for(var i=start;i<topology.objects.collection.geometries.length;i++){
+      topology.objects.collection.geometries[i].id = i+1;
+    }
+  }
+  if(req.query && req.query.animalstyle == "true"){
+    var animals = [ "olinguillo", "armadillo", "zebra", "chimpanzee", "dragon", "tiger", "lion", "squirrel", "dog", "frog", "shark", "tortoise", "giraffe", "parrot", "ant", "aphid", "spider", "crab", "tuna" ];
+    for(var i=0;i<topology.objects.collection.geometries.length;i++){
+      topology.objects.collection.geometries[i].id = animals[ Math.floor(Math.random() * animals.length) ] + topology.objects.collection.geometries[i].id;
+    }
+  }
+  return res.json( topology );
+};
+
 app.post('/', function(req, res){
   // check for POSTed files through web interface
   var fileCount = 0;
@@ -22,7 +39,7 @@ app.post('/', function(req, res){
     fileCount++;
     fs.readFile(req.files[file].path, function(error, file){
       var topology = topojson.topology({collection: JSON.parse( file ) });
-      return topo_out( req, topology );
+      return topo_out( req, res, topology );
     });
     break;
   }
@@ -31,7 +48,7 @@ app.post('/', function(req, res){
     if(req.body && req.body.type && (req.body.geometry || req.body.coordinates || req.body.features)){
       if(req.body.features){
         var topology = topojson.topology({collection: req.body });
-        return topo_out( req, topology );
+        return topo_out( req, res, topology );
       }
       else{
         return res.json( req.body );
@@ -43,7 +60,7 @@ app.post('/', function(req, res){
       for(var bodyvar in req.body){
         varCount++;
         var topology = topojson.topology({collection: req.body[bodyvar] });
-        return topo_out( req, topology );
+        return topo_out( req, res, topology );
       }
       if(varCount == 0){
         res.send('no GeoJSON?');
@@ -51,20 +68,3 @@ app.post('/', function(req, res){
     }
   }
 });
-
-var topo_out = function( req, topology ){
-  if(req.query.doubledouble == "true"){
-    var start = topology.objects.collection.geometries.length;
-    topology.objects.collection.geometries = topology.objects.collection.geometries.concat( topology.objects.collection.geometries );
-    for(var i=start;i<topology.objects.collection.geometries.length;i++){
-      topology.objects.collection.geometries[i].id = i+1;
-    }
-  }
-  if(req.query.animalstyle == "true"){
-    var animals = [ "olinguillo", "armadillo", "zebra", "chimpanzee", "dragon", "tiger", "lion", "squirrel", "dog", "frog", "shark", "tortoise", "giraffe", "parrot", "ant", "aphid", "spider", "crab", "tuna" ];
-    for(var i=0;i<topology.objects.collection.geometries.length;i++){
-      topology.objects.collection.geometries[i].id = animals[ Math.floor(Math.random() * animals.length) ] + topology.objects.collection.geometries[i].id;
-    }
-  }
-  return res.json( topology );
-};
