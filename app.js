@@ -16,14 +16,15 @@ app.get('/', function(req, res){
 });
 
 var topo_out = function( req, res, topology ){
-  if(req.query && req.query.doubledouble == "true"){
+  if(req.query && (req.query.doubledouble == "true" || req.query.doubleDouble == "true" || req.query.DoubleDouble == "true")){
     var start = topology.objects.collection.geometries.length;
-    topology.objects.collection.geometries = topology.objects.collection.geometries.concat( topology.objects.collection.geometries );
-    for(var i=start;i<topology.objects.collection.geometries.length;i++){
-      topology.objects.collection.geometries[i].id = i+1;
+    for(var i=0;i<start;i++){
+      var newobj = [ topology.objects.collection.geometries[i] ].concat();
+      newobj[0].id = start + i + 1;
+      topology.objects.collection.geometries.push( newobj[0] );
     }
   }
-  if(req.query && req.query.animalstyle == "true"){
+  if(req.query && (req.query.animalstyle == "true" || req.query.animalStyle == "true" || req.query.AnimalStyle == "true")){
     var animals = [ "olinguillo", "armadillo", "zebra", "chimpanzee", "dragon", "tiger", "lion", "squirrel", "dog", "frog", "shark", "tortoise", "giraffe", "parrot", "ant", "aphid", "spider", "crab", "tuna" ];
     for(var i=0;i<topology.objects.collection.geometries.length;i++){
       topology.objects.collection.geometries[i].id = animals[ Math.floor(Math.random() * animals.length) ] + topology.objects.collection.geometries[i].id;
