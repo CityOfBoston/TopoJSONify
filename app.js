@@ -20,7 +20,7 @@ var topo_out = function( req, res, topology ){
     var endpt = topology.objects.collection.geometries.length;
     for(var i=0;i<endpt;i++){
       var newobj = {
-        id: start + i + 1,
+        id: endpt + i + 1,
         type: topology.objects.collection.geometries[i].type + "",
         arcs: topology.objects.collection.geometries[i].arcs.concat( )
       };
