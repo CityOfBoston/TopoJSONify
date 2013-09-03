@@ -4,7 +4,7 @@
   , "private": true
   , "dependencies": {
       "express": "3.X"
-    , "topojson": "1.2.3"
+    , "topojson": "1.4.0"
   },
   "engines": {
         "node": "0.8.X",
