@@ -36,13 +36,18 @@ var topo_out = function( req, res, topology ){
   return res.json( topology );
 };
 
+keepProps = function(properties, key, value) {
+  properties[key] = value;
+  return true;
+};
+
 app.post('/', function(req, res){
   // check for POSTed files through web interface
   var fileCount = 0;
   for(var file in req.files){
     fileCount++;
     fs.readFile(req.files[file].path, function(error, file){
-      var topology = topojson.topology({collection: JSON.parse( file ) });
+      var topology = topojson.topology({ collection: JSON.parse( file ), "property-transform": keepProps });
       return topo_out( req, res, topology );
     });
     break;
@@ -51,7 +56,7 @@ app.post('/', function(req, res){
     // check for POSTed GeoJSON directly in body
     if(req.body && req.body.type && (req.body.geometry || req.body.coordinates || req.body.features)){
       if(req.body.features){
-        var topology = topojson.topology({collection: req.body });
+        var topology = topojson.topology({ collection: req.body, "property-transform": keepProps });
         return topo_out( req, res, topology );
       }
       else{
@@ -63,7 +68,7 @@ app.post('/', function(req, res){
       var varCount = 0;
       for(var bodyvar in req.body){
         varCount++;
-        var topology = topojson.topology({collection: req.body[bodyvar] });
+        var topology = topojson.topology({ collection: req.body[bodyvar], "property-transform": keepProps });
         return topo_out( req, res, topology );
       }
       if(varCount == 0){
