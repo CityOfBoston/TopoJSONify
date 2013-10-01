@@ -9,10 +9,15 @@ app.use(express.bodyParser());
 app.set('json spaces',0);
 app.use(express.compress());
 app.use(express.methodOverride());
+app.use('/', express.static(__dirname + '/static'));
 app.listen(port);
 
 app.get('/', function(req, res){
   res.sendfile(__dirname + '/index.html');
+});
+
+app.get('/map', function(req, res){
+  res.sendfile(__dirname + '/map.html');
 });
 
 var topo_out = function( req, res, topology ){
@@ -56,7 +61,7 @@ app.post('/', function(req, res){
     // check for POSTed GeoJSON directly in body
     if(req.body && req.body.type && (req.body.geometry || req.body.coordinates || req.body.features)){
       if(req.body.features){
-        var topology = topojson.topology({ collection: req.body }, { "property-transform": keepProps });
+        var topology = topojson.topology({ collection: JSON.parse( req.body ) }, { "property-transform": keepProps });
         return topo_out( req, res, topology );
       }
       else{
@@ -68,7 +73,7 @@ app.post('/', function(req, res){
       var varCount = 0;
       for(var bodyvar in req.body){
         varCount++;
-        var topology = topojson.topology({ collection: req.body[bodyvar] }, { "property-transform": keepProps });
+        var topology = topojson.topology({ collection: JSON.parse( req.body[bodyvar] ) }, { "property-transform": keepProps });
         return topo_out( req, res, topology );
       }
       if(varCount == 0){

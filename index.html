@@ -2,12 +2,11 @@
 <html>
   <head>
     <title>TopoJSONify</title>
-    <link href='http://fonts.googleapis.com/css?family=Press+Start+2P' rel='stylesheet' type='text/css'/>
     <style type="text/css">
 html{
   padding: 0;
   margin: 0;
-  font-family: "Press Start 2P", sans-serif;
+  font-family: sans-serif;
   text-align: center;
 }
 h1{
@@ -20,7 +19,7 @@ div.content{
   width: 80%;
 }
 code, input, #submit{
-  font-family: "Press Start 2P", sans-serif;
+  font-family: sans-serif;
 }
 p{
   padding-top: 30px;
@@ -32,7 +31,7 @@ a{
     </style>
   </head>
   <body>
-    <h1>TopoJSONify <small>Crazy Simple API</small></h3>
+    <h1>TopoJSONify <small>A Simple API</small></h3>
     <div class="content">
       <p>
         Upload a GeoJSON FeatureCollection or POST it to http://topojsonify.herokuapp.com/
@@ -52,6 +51,14 @@ a{
           <code>POST http://topojsonify.herokuapp.com/</code>
           <br/>
           <p>POST directly in the body, or as a variable in the POST body</p>
+        </li>
+        <li>
+          <h3>Map</h3>
+          <code>Edit your data on
+            <a href="/map">http://topojsonify.herokuapp.com/map</a>
+          </code>
+          <br/>
+          <p>Drop GeoJSON or TopoJSON onto the map, draw and edit geometry, get back TopoJSON</p>
         </li>
       </ol>
       <br/>

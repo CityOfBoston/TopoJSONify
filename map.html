@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>TopoJSONify Map</title>
+    <link type="text/css" rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+    <link type="text/css" rel="stylesheet" href="/stylesheets/leaflet.draw.css" />
+    <!--[if lte IE 8]>
+      <link type="text/css" rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+      <link type="text/css" rel="stylesheet" href="/stylesheets/leaflet.draw.ie.css" />
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="/stylesheets/topojsonify-editor.css"/>
+  </head>
+  <body>
+    <div id="map">
+      <div id="overlay">
+        <h1>TopoJSONify</h1>
+        <p>Edit tool</p>
+        <ol>
+          <li>Drop GeoJSON or TopoJSON onto this page</li>
+          <li>Make edits</li>
+          <li>Add any new shapes</li>
+          <li>
+            <form action="/" method="POST">
+              <input id="geojson" type="hidden" name="geojson" val=""/>
+              <input type="submit" value="Export as TopoJSON"/>
+            </form>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    <script type="text/javascript" src="/scripts/leaflet.draw.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/scripts/json3.min.js"></script>
+    <script type="text/javascript" src="/scripts/topojson.v1.min.js"></script>
+    <script type="text/javascript" src="/scripts/topojsonify-editor.js"></script>
+  </body>
+</html>
