@@ -78,14 +78,71 @@ map.on('draw:edited', function(e){
   e.layers.eachLayer(updateLayer);
   $("#geojson").val('{ "type": "FeatureCollection", "features": ' + JSON.stringify( mygeojson.features ) + ' }');
 });
+function updateLayer(layer){
+  if(typeof layer.id == "undefined" && typeof layer.feature.id != "undefined"){
+    layer.id = layer.feature.id;
+  }
+  if(typeof layer.id != "undefined"){
+    for(var f=0;f<mygeojson.features.length;f++){
+      var layerid = layer.id;
+      var multi = null;
+      if(layerid.indexOf("multi_") == 0){
+        layerid = layerid.substring(6);
+        multi = 1 * layerid.substring(layerid.lastIndexOf("_") + 1);
+        layerid = layerid.substring(0, layerid.lastIndexOf("_"));
+      }
+      if(mygeojson.features[f].id == layerid){
+        var feature;
+        if(multi === null){
+          feature = mygeojson.features[f];
+        }
+        else{
+          feature = mygeojson.features[f].geometry.coordinates[multi];
+        }
+        if(feature.geometry.type == "Point"){
+          var pt = layer.getLatLng();
+          feature.geometry.coordinates = [ pt.lng.toFixed(6) * 1, pt.lat.toFixed(6) * 1 ];
+        }
+        else if(typeof layer.getLatLngs == "function"){
+          var pts = layer.getLatLngs();
+          if(feature.geometry.type == "Polygon"){
+            feature.geometry.coordinates = [ [ ] ];
+            for(var p=0;p<pts.length;p++){
+              feature.geometry.coordinates[0].push( [ pts[p].lng.toFixed(6) * 1, pts[p].lat.toFixed(6) * 1 ] );
+            }
+          }
+          else{
+            feature.geometry.coordinates = [ ];
+            for(var p=0;p<pts.length;p++){
+              feature.geometry.coordinates.push( [ pts[p].lng.toFixed(6) * 1, pts[p].lat.toFixed(6) * 1 ] );
+            }
+          }
+        }
+        break;
+      }
+    }
+  }
+}
 
 map.on('draw:deleted', function(e){
   // remove any deleted layers from the GeoJSON
   e.layers.eachLayer(function(layer){
     if(typeof layer.id != "undefined"){
+      var layerid = layer.id;
+      var multi = null;
+      if(layerid.indexOf("multi_") == 0){
+        layerid = layerid.substring(6);
+        multi = 1 * layerid.substring(layerid.lastIndexOf("_") + 1);
+        layerid = layerid.substring(0, layerid.lastIndexOf("_"));
+      }
       for(var f=0;f<mygeojson.features.length;f++){
-        if(mygeojson.features[f].id == layer.id){
-          mygeojson.features.splice(f, 1);
+        if(mygeojson.features[f].id == layerid){
+          if(multi === null){
+            mygeojson.features.splice(f, 1);
+          }
+          else{
+            mygeojson.features[f].geometry.coordinates.splice(multi, 1);
+          }
           break;
         }
       }
@@ -127,10 +184,21 @@ function processFile(e){
     }
     var gj = L.geoJson(injson, {
       onEachFeature: function(feature, layer){
-        layer.setStyle({ editable: true });
         mygeojson.features.push( feature );
+        if(typeof layer.getLayers == "function"){
+          for(var i=0;i<layer.getLayers().length;i++){
+            var partlayer = layer.getLayers()[i];
+            partlayer.id = "multi_" + layer.id + "_" + i;
+            partlayer.setStyle({ editable: true });
+            partlayer.addTo(editableLayers);
+          }
+        }
+        else{
+          layer.setStyle({ editable: true });
+          layer.addTo(editableLayers);
+        }
       }
-    }).addTo(editableLayers);
+    });
     map.fitBounds( gj.getBounds() );
   }
   $("#geojson").val( JSON.stringify( mygeojson ) );
