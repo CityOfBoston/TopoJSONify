@@ -9,7 +9,7 @@ map.attributionControl.setPrefix('');
 // basemap
 var terrain = 'http://{s}.tiles.mapbox.com/v3/mapmeld.map-ofpv1ci4/{z}/{x}/{y}.png';
 var terrainAttrib = 'Map data &copy; 2013 OpenStreetMap contributors, Tiles &copy; 2013 MapBox';
-L.tileLayer(terrain, {maxZoom: 15, attribution: terrainAttrib}).addTo(map);
+L.tileLayer(terrain, {maxZoom: 18, attribution: terrainAttrib}).addTo(map);
 
 // draw control
 var editableLayers = new L.FeatureGroup();
@@ -164,11 +164,32 @@ var dropFile = function(e){
   files = e.dataTransfer.files;
   if(files && files.length){
     reader = new FileReader();
+    
+    if(files[0].name.toLowerCase().slice(-3) == 'zip'){
+      reader.onload = function(){
+        if(reader.readyState !== 2 || reader.error){
+          alert("Read Error");
+          console.log(reader.error);
+          return;
+        }
+        processSHPZIP( reader.result );
+      };
+      reader.readAsArrayBuffer(files[0]);
+      return;
+    }
+    
     reader.onload = processFile;
-    fileindex = 0;
     reader.readAsText(files[0]);
   }
 };
+
+function processSHPZIP(arraydata){
+  shp(arraydata).then(function(gj){
+    loadGeoJSON(gj);
+  }, function(err){
+    alert("Couldn't load shapefile: " + err);
+  });
+}
 
 function processFile(e){
   var injson = null;
@@ -176,32 +197,36 @@ function processFile(e){
     injson = $.parseJSON( e.target.result );
   }
   catch(err){
-  
+    alert("Didn't recognize file");
   }
   if(injson){
     if(injson.type == "Topology"){
       injson = topojson.feature( injson, injson.objects.collection )
     }
-    var gj = L.geoJson(injson, {
-      onEachFeature: function(feature, layer){
-        mygeojson.features.push( feature );
-        if(typeof layer.getLayers == "function"){
-          for(var i=0;i<layer.getLayers().length;i++){
-            var partlayer = layer.getLayers()[i];
-            partlayer.id = "multi_" + layer.id + "_" + i;
-            partlayer.setStyle({ editable: true });
-            partlayer.addTo(editableLayers);
-          }
-        }
-        else{
-          layer.setStyle({ editable: true });
-          layer.addTo(editableLayers);
-        }
-      }
-    });
-    map.fitBounds( gj.getBounds() );
+    loadGeoJSON(injson);
   }
   $("#geojson").val( JSON.stringify( mygeojson ) );
+}
+
+function loadGeoJSON(injson){
+  var gj = L.geoJson(injson, {
+    onEachFeature: function(feature, layer){
+      mygeojson.features.push( feature );
+      if(typeof layer.getLayers == "function"){
+        for(var i=0;i<layer.getLayers().length;i++){
+          var partlayer = layer.getLayers()[i];
+          partlayer.id = "multi_" + layer.id + "_" + i;
+          partlayer.setStyle({ editable: true });
+          partlayer.addTo(editableLayers);
+        }
+      }
+      else{
+        layer.setStyle({ editable: true });
+        layer.addTo(editableLayers);
+      }
+    }
+  });
+  map.fitBounds( gj.getBounds() );
 }
 
 // set up file dropping

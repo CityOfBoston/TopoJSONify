@@ -10,7 +10,9 @@ Now you can get your GeoJSON converted to TopoJSON, programatically, over the we
 
 Get your GeoJSON FeatureCollection and do one of the following:
 
-* Go to http://topojsonify.herokuapp.com/ and upload your GeoJSON file
+* Go to http://topojsonify.heroku.com/ and upload your GeoJSON file
+
+* Go to http://topojsonify.heroku.com/map and drop in GeoJSON, TopoJSON, and Shapefiles to edit and extend with Leaflet.draw. Press TopoJSON button.
 
 * POST http://topojsonify.herokuapp.com/ with your GeoJSON file in the body
 
